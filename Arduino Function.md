@@ -53,3 +53,12 @@
 • Serial.flush() 清空缓冲器。<br>
 • Serial.print(data) 串口输出数据。<br>
 • Serial.println(data) 串口输出数据并带回车符。<br>
+
+**内容注释**
+![](1.png)
+
+![](2.png)
+
+![](3.png)
+
+![](4.png)
