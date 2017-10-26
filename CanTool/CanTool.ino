@@ -78,7 +78,20 @@ void replyMsg(String message)
   int msgLength = message.length();
   for(int i = 0; i < msgLength; i++)
   {
+<<<<<<< HEAD
     Serial.write(message[i]);
+=======
+    message += "\r";
+    }
+  else
+  {
+    message += "\a";
+    }
+  int mesLength = message.length();
+  for(int i = 0; i < mesLength; i++)
+  {
+    Serial.write(message.charAt(i));
+>>>>>>> refs/remotes/origin/master
     }
   }
 
