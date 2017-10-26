@@ -39,7 +39,10 @@ void judgeMsg(String message){
   //reply version message
   char judgeChar = message[0];
   int msgLength = message.length();
-  Serial.write(message);
+  for(int i = 0; i < msgLength; i++)
+  {
+    Serial.write(message[i]);
+    }
   Serial.write(msgLength);
   if((judgeChar == 'V') /*&& (msgLength == 2)*/)
   {
