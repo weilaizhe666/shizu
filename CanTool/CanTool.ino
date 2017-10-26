@@ -4,6 +4,7 @@ String versionMsg = "SV2.5-HV2.0";
 int state = 0;
 int canBusSpeed = 0;
 String msgReply = "";
+int msgLength = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -26,6 +27,7 @@ void serialEvent(){
   while(Serial.available())
   {
     char inChar = (char)Serial.read();
+	msgLength++;
     inputString += inChar;
     if(inChar == '\r')
     {
@@ -38,12 +40,7 @@ void serialEvent(){
 void judgeMsg(String message){
   //reply version message
   char judgeChar = message[0];
-  int msgLength = message.length();
-  for(int i = 0; i < msgLength; i++)
-  {
-    Serial.write(message[i]);
-    }
-  Serial.write(msgLength);
+  Serial.print(msgLength);
   if((judgeChar == 'V') /*&& (msgLength == 2)*/)
   {
     msgReply = versionMsg;
@@ -80,7 +77,6 @@ void judgeMsg(String message){
 //reply message
 void replyMsg(String message)
 {
-  int msgLength = message.length();
   for(int i = 0; i < msgLength; i++)
   {
     Serial.write(message[i]);
