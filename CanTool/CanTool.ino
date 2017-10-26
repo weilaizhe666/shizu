@@ -77,7 +77,7 @@ void replyMessage(int x, String message)
     }
   else
   {
-    message += "\BEL";
+    message += "\a";
     }
   int mesLength = message.length();
   for(int i = 0; i < mesLength; i++)
