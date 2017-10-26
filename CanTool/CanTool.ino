@@ -1,8 +1,9 @@
 String inputString = "";
 boolean stringComplete = false;
-String versionMessage = "SV2.5-HV2.0";
+String versionMsg = "SV2.5-HV2.0";
 int state = 0;
 int canBusSpeed = 0;
+String msgReply = "";
 
 void setup() {
   // put your setup code here, to run once:
@@ -14,7 +15,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   if(stringComplete)
   {
-    judgeMessage(inputString);
+    judgeMsg(inputString);
     inputString = "";
     stringComplete = false;
     }
@@ -30,59 +31,54 @@ void serialEvent(){
     {
       stringComplete = true;
       }
+     delay(2);
     }
   }
 
-void judgeMessage(String message){
+void judgeMsg(String message){
   //reply version message
-  char judgeChar = message.charAt(0);
-  int mesLength = message.length();
-  if((judgeChar == 'V') && (mesLength == 2))
+  char judgeChar = message[0];
+  int msgLength = message.length();
+  if((judgeChar == 'V') && (msgLength == 2))
   {
-    replyMessage(1, versionMessage);
+    msgReply = versionMsg;
+    replyMsg(msgReply);
     }
   //rely open command
-  else if((message.startsWith("O1")) && (mesLength == 3))
+  else if((message.startsWith("O1")) && (msgLength == 3))
   {
     openCommand();
     }
   //reply close command
-  else if((judgeChar == 'C') && (mesLength == 2))
+  else if((judgeChar == 'C') && (msgLength == 2))
   {
     closeCommand();
     }
   //reply speed command
-  else if((judgeChar == 'S') && (mesLength == 3))
+  else if((judgeChar == 'S') && (msgLength == 3))
   {
-    speedCommand(int(message.charAt(1)));
+    speedCommand((int)message[1]);
     }
   //reply message
   else if(state == 1 && (judgeChar == 't' || judgeChar == 'T'))
   {
-    getMessage(message);
+    getMsg(message);
     }
   else
   {
-    replyMessage(0, "");
+    msgReply = "\\BEL";
+    replyMsg(msgReply);
     }
   
   }
 
 //reply message
-void replyMessage(int x, String message)
+void replyMsg(String message)
 {
-  if(x == 1)
+  int msgLength = message.length();
+  for(int i = 0; i < msgLength; i++)
   {
-    message += "\r";
-    }
-  else
-  {
-    message += "\BEL";
-    }
-  int mesLength = message.length();
-  for(int i = 0; i < mesLength; i++)
-  {
-    Serial.write(message.charAt(i));
+    Serial.write(message[i]);
     }
   }
 
@@ -92,11 +88,13 @@ void openCommand()
   if(state == 0)
   {
     state = 1;
-    replyMessage(1, "");
+    msgReply = '\r';
+    replyMsg(msgReply);
     }
   else
   {
-    replyMessage(0, "");
+    msgReply = "\\BEL";
+    replyMsg(msgReply);
     }
   }
 
@@ -106,11 +104,13 @@ void closeCommand()
   if(state == 1)
   {
     state == 0;
-    replyMessage(1, "");
+    msgReply = '\r';
+    replyMsg(msgReply);
     }
   else
   {
-    replyMessage(0, "");
+    msgReply = "\\BEL";
+    replyMsg(msgReply);
     }
   }
 
@@ -120,48 +120,83 @@ void speedCommand(int speedNum)
   if(state == 0 && speedNum >= 0 && speedNum <= 8)
   {
     canBusSpeed = speedNum;
-    replyMessage(1, "");
+    msgReply = '\r';
+    replyMsg(msgReply);
     }
   else
   {
-    replyMessage(0, "");
+    msgReply = "\\BEL";
+    replyMsg(msgReply);
     }
   }
 //get message
-void getMessage(String message){
+void getMsg(String message){
   int len = message.length();
   int dataLen = 0;
   int idLen = 0;
-  int times = 1;
+  int cycleNum = 0;
   String cycleJudge = message.substring(len - 5, len);
   if(message[0] == 't')
   {
-    dataLen = int(message[4]);
+    dataLen = (int)message[4];
     idLen = 9;
     }
   else
   {
-    dataLen = int(message[9]);
+    dataLen = (int)message[9];
     idLen = 14;
     }
   if(dataLen < 0 || dataLen > 8)
   {
-    replyMessage(0, "");
+    msgReply = "\\BEL";
+    replyMsg(msgReply);
     return;
     }
   if(len != dataLen * 2 + idLen)
   {
-    replyMessage(0, "");
+    msgReply = "\\BEL";
+    replyMsg(msgReply);
     return;
     }
-  if(cycleJudge != "0000")
-  {
-   //cycleMessage(message);
-    }
-  else
-  {
-    replyMessage(1, "");
-    }
+  msgReply = '\r';
+  replyMsg(msgReply);
+  cycleNum = changeChartoInt(cycleJudge);
+  cycleMessage(message, cycleNum);
   }
 
+int changeChartoInt(String cycleJudge){
+  int num = 0;
+  for(int i = 0; i < 4; i++)
+  {
+    num += pow(16, 3 - i) * judgeChar(cycleJudge[i]);
+    }
+  return num;
+  }
+  
+int judgeChar(char a){
+  switch(a)
+  {
+    case '0': return 0;
+    case '1': return 1;
+    case '2': return 2;
+    case '3': return 3;
+    case '4': return 4;
+    case '5': return 5;
+    case '6': return 6;
+    case '7': return 7;
+    case '8': return 8;
+    case '9': return 9;
+    case 'A': return 10;
+    case 'B': return 11;
+    case 'C': return 12;
+    case 'D': return 13;
+    case 'E': return 14;
+    case 'F': return 15;
+    default: return 0;
+    }
+  }
+  
+void cycleMessage(String message, int cycleNum){
+  return;
+  }
 
