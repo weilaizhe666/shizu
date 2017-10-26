@@ -39,7 +39,7 @@ void judgeMsg(String message){
   //reply version message
   char judgeChar = message[0];
   int msgLength = message.length();
-  if((judgeChar == 'V') && (msgLength == 2))
+  if((judgeChar == 'V') /*&& (msgLength == 2)*/)
   {
     msgReply = versionMsg;
     replyMsg(msgReply);
