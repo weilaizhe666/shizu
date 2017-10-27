@@ -1,12 +1,12 @@
 String inputString = "";
 boolean stringComplete = false;
-String versionMsg = "SV2.5-HV2.0\\r";
+String versionMsg = "SV2.5-HV2.0\r";
 int state = 0;
 int canBusSpeed = 0;
 String msgReply = "";
 int msgLength = 0;
-String testMsg = "t12F4112233F40110\\rT1234567F811223344556677880000\\rt12F4112233F40110\\r";
-int testTimes = 1;
+String testMsg[100] = {"t12F4112233F40110\r", "T1234567F811223344556677880000\r", "t12F4112233F40110\r"};
+int testTimes = 0;
 
 void setup() {
   // put your setup code here, to run once:
@@ -24,15 +24,6 @@ void loop() {
     stringComplete = false;
     msgLength = 0;
     }
-  if(state == 1 && testTimes > 0)
-  {
-    for(int i = 0; i < testMsg.length();i++)
-    {
-      Serial.write(testMsg[i]);
-      delay(2);
-      }
-      testTimes--;
-    }
 }
 
 //get input
@@ -41,7 +32,7 @@ void serialEvent(){
   {
     char inChar = (char)Serial.read();
     inputString += inChar;
-    if(inputString.endsWith("\\r"))
+    if(inChar == '\r')
     {
       stringComplete = true;
       break;
@@ -54,23 +45,24 @@ void serialEvent(){
 void judgeMsg(String message){
   char judgeChar = message[0];
   //reply version message
-  if((judgeChar == 'V') && (msgLength == 3))
+  if(judgeChar == 'V')
   {
     msgReply = versionMsg;
     replyMsg(msgReply);
     }
   //reply speed command
-  else if((judgeChar == 'S') && (msgLength == 4))
+  else if(judgeChar == 'S')
   {
     speedCommand((int)(message[1] - '0'));
     }
   //rely open command
-  else if((message.startsWith("O1")) && (msgLength == 4))
+  else if(message.startsWith("O1"))
   {
+    testTimes = 1;
     openCommand();
     }
   //reply close command
-  else if((judgeChar == 'C') && (msgLength == 3))
+  else if(judgeChar == 'C')
   {
     closeCommand();
     }
@@ -81,7 +73,7 @@ void judgeMsg(String message){
     }
   else
   {
-    msgReply = "\\BEL";
+    msgReply = (char)7;
     replyMsg(msgReply);
     }
   
@@ -102,12 +94,25 @@ void openCommand()
   if(state == 0)
   {
     state = 1;
-    msgReply = "\\r";
+    msgReply = '\r';
     replyMsg(msgReply);
+    if(state == 1 && testTimes ==1)
+    {  
+      for(int i = 0; i < 100; i++)
+      {
+        if(testMsg[i] == "")
+        {
+          break;
+          }
+        Serial.print(testMsg[i]);
+        delay(500);
+        }
+      testTimes = 0;
+      }
     }
   else
   {
-    msgReply = "\\BEL";
+    msgReply = (char)7;
     replyMsg(msgReply);
     }
   }
@@ -118,12 +123,12 @@ void closeCommand()
   if(state == 1)
   {
     state = 0;
-    msgReply = "\\r";
+    msgReply = '\r';
     replyMsg(msgReply);
     }
   else
   {
-    msgReply = "\\BEL";
+    msgReply = (char)7;
     replyMsg(msgReply);
     }
   }
@@ -134,12 +139,12 @@ void speedCommand(int speedNum)
   if(state == 0 && speedNum >= 0 && speedNum <= 8)
   {
     canBusSpeed = speedNum;
-    msgReply = "\\r";
+    msgReply = '\r';
     replyMsg(msgReply);
     }
   else
   {
-    msgReply = "\\BEL";
+    msgReply = (char)7;
     replyMsg(msgReply);
     }
   }
@@ -149,30 +154,30 @@ void getMsg(String message){
   int dataLen = 0;
   int restLen = 0;
   int cycleNum = 0;
-  String cycleJudge = message.substring(msgLength - 6, msgLength - 2);
+  String cycleJudge = message.substring(msgLength - 5, msgLength - 1);
   if(message[0] == 't')
   {
     dataLen = (int)(message[4] - '0');
-    restLen = 11;
+    restLen = 10;
     }
   else
   {
     dataLen = (int)(message[9] - '0');
-    restLen = 16;
+    restLen = 15;
     }
   if(dataLen < 0 || dataLen > 8)
   {
-    msgReply = "\\BEL";
+    msgReply = (char)7;
     replyMsg(msgReply);
     return;
     }
   if(msgLength != dataLen * 2 + restLen)
   {
-    msgReply = "\\BEL";
+    msgReply = (char)7;
     replyMsg(msgReply);
     return;
     }
-  msgReply = "\\r";
+  msgReply = '\r';
   replyMsg(msgReply);
   cycleNum = changeChartoInt(cycleJudge);
   cycleMessage(message, cycleNum);
