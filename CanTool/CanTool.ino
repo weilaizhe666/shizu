@@ -5,7 +5,10 @@ int state = 0;
 int canBusSpeed = 0;
 String msgReply = "";
 int msgLength = 0;
-String testMsg[100] = {"t12F4112233F40110\r", "T1234567F811223344556677880000\r", "t12F4112233F40110\r"};
+String testMsg[100] = {"t03D80000000000000000\r", "t39380000160000000000\r", "t32180027021500002000\r", "t3218F3000A4D00002000\r", \
+                       "T0000034580000000008480000\r", "T0000042B8E400000000000000\r", "T000003608063A0035E5000000\r", "T0000036383308000000000027\r", \
+                       "T0000060080000000000000000\r"
+                       };
 int testTimes = 0;
 
 void setup() {
@@ -226,4 +229,3 @@ int double2int(double in){
 void cycleMessage(String message, int cycleNum){
   return;
   }
-
