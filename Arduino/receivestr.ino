@@ -53,10 +53,10 @@ void loop()
       Serial.End();
       break;
     default:
-      Serial.println('\a');
+      Serial.println("\BEL");
     }
     lineEnd = false;
     str = "";
   }
-  delay(50);
+  delay(500);
 }
